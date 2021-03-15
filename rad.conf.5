@@ -1,0 +1,33 @@
+.TH RAD.CONF 5 2021-03-15 GNU "File Formats Manual" 	
+
+.SH NAME
+
+rad.conf \- rad configuration file.
+
+.SH DESCRIPTION
+
+rad(1) is configured using the TOML format, in the \fB/etc/rad.toml\fR file.
+
+The syntax to allow an user to run commands is defined as following:
+
+	[\fIusername\fR]
+.br
+	# The commands that the user can run without specifying his password
+.br
+	no_password = ["program0", "program1", "program2"] # Can be set to "ALL" to allow all commands to be run without password.
+
+	# The programs that can be run by the user
+.br
+	programs = ["program0", "program1", "program2"] # Can be set to "ALL" to allow all commands to be run without password.
+
+.SH FILES
+
+/etc/rad.toml    The rad(1) configuration file.
+
+.SH SEE ALSO
+
+rad(1)
+
+.SH AUTHORS
+
+Wafelack <\fIwafelack@protonmail.com\fR>

@@ -1,0 +1,50 @@
+.TH RAD 1 2021-03-15 GNU "User Commands Manual"
+
+.SH NAME
+rad \- execute commands as administrator.
+
+.SH SYNOPSIS
+
+\fBrad\fR \fICOMMAND\fR \fIARGS\fR...
+
+.SH DESCRIPTION
+
+\fBrad\fR executes a given command as administrator.
+
+The user will be prompted for his password (at most 3 times) unless the \fICOMMAND\fR is in the \fBno_password\fR list.
+
+This program is configured via the \fB/etc/rad.toml\fR file.
+.br
+See rad.conf(5) for more informations on the configuration. 
+
+The available options are defined as follows:
+
+\fICOMMAND\fR        The command to run as administrator
+
+\fIARGS\fR...        The arguments to pass to the command.
+
+.SH EXIT STATUS
+
+\fBrad\fR returns 0 in case of success, it returns 1 in the following cases:
+
+\fB•\fR The user who runs the command is not in the \fB/etc/rad.toml\fR.
+.br
+\fB•\fR The user who runs the command is not authorized to run it.
+.br
+\fB•\fR The \fB/etc/rad.toml\fR file does not exist.
+.br
+\fB•\fR The user inputs an incorrect password 3 times.
+.br
+\fB•\fR The specified command was not found or is not executable.
+
+.SH FILES
+\fB•\fR /etc/rad.toml	The configuration file.
+
+.SH EXAMPLE
+\fBrad\fR emerge cowsay
+
+.SH AUTHORS
+Wafelack <\fIwafelack@protonmail.com\fR>
+
+.SH SEE ALSO
+rad.conf(5)

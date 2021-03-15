@@ -14,3 +14,17 @@
 ## Core
 
 * Writing command runner.
+
+# 0.1.1 - 15/03/2021
+
+## Clean
+
+*  Removing unused files.
+
+## Fix
+
+*  Fixing security breach. Fixing username getting (previously via $USER, that made faking possible) with syscall and /etc/passwd parsing.
+
+## Scripts
+
+*  Added uninstall rule to makefile.

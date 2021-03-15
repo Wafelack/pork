@@ -16,22 +16,38 @@
  *  along with rad.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-use std::{env, path::Path, process::Command};
+use std::{fs, env, path::Path, process::Command};
 
 mod config;
 mod errors;
 mod password;
 
 pub use errors::{error, RadError, Result};
-use libc::setuid;
+use libc::{setuid, getuid};
 use password::check_password;
+
+pub fn get_username(uid: u32) -> Result<String> {
+    let content = fs::read_to_string("/etc/passwd")?;
+
+    for line in content.lines() {
+        let splited = line.split(':').collect::<Vec<_>>();
+
+        if splited[2].parse::<u32>().unwrap() == uid {
+            return Ok(
+                splited[0].to_string()
+                )
+        }
+    }
+
+    Err(error("No user found for this UID."))
+}
 
 fn main() -> Result<()> {
 
     let config_file = "/etc/rad.toml";
 
     let args = std::env::args().skip(1).collect::<Vec<_>>();
-  
+
     let usage = format!("Usage: {} command ARGS...", env!("CARGO_PKG_NAME"));
 
     if args.len() < 1 {
@@ -54,17 +70,21 @@ fn main() -> Result<()> {
         println!("{}", env!("CARGO_PKG_VERSION"));
         return Ok(())
     }
-    
+
     let command = &args[0];
 
     if !Path::new(config_file).exists() {
         Err(error(format!(
-            "Cannot find file `{}`. Consider creating it and adding content to it to use {}",
-            config_file,
-            env!("CARGO_PKG_NAME")
-        )))
+                    "Cannot find file `{}`. Consider creating it and adding content to it to use {}",
+                    config_file,
+                    env!("CARGO_PKG_NAME")
+                    )))
     } else {
-        let user = env::var("USER").unwrap();
+        
+        let user = get_username(unsafe {
+            getuid()
+        })?;
+
         let (authorized, no_password) =
             config::can_run_program(command, &user, config_file)?;
 
@@ -75,7 +95,7 @@ fn main() -> Result<()> {
         if !no_password {
             let mut pass =
                 rpassword::prompt_password_stdout(&format!("[rad] Password for {}: ", user))
-                    .unwrap();
+                .unwrap();
             let mut counter = 1;
             while !check_password(&user, &pass)? && counter < 3 {
                 eprintln!("Authentication failed, please retry.");

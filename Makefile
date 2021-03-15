@@ -7,8 +7,8 @@ $(BINARY) : $(FILES)
 
 install : $(BINARY)
 	chown root:root $(BINARY)
-	chmod 4751 $(BINARY)
 	cp $(BINARY) /usr/bin/
+	chmod 4711 /usr/bin/rad
 	touch $(CONF)
 	chown root:root $(CONF)
 	chmod 600 $(CONF)

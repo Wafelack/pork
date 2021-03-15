@@ -14,3 +14,8 @@ install : $(BINARY)
 	chmod 600 $(CONF)
 	cp rad.1 /usr/share/man/man1/
 	cp rad.conf.5 /usr/share/man/man5/
+
+uninstall :
+	rm /usr/bin/rad
+	rm /usr/share/man/man1/rad.1
+	rm /usr/share/man/man5/rad.conf.5

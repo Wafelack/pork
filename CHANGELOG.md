@@ -35,3 +35,23 @@
 
 *  Securising password system. Use of pam instead of parsing /etc/shadow.
 *  Securising get_username. Using libc function getpwuid() instead of reading /etc/passwd.
+
+# 0.1.3 - 16/03/2021
+
+## Feat
+
+*  Improving username getting with CString.
+*  Using custom PAM service.
+*  Added full path command resolving Added full path command resolving, which is more secure to avoid privilege escalation.
+
+## Scripts
+
+*  Fixing makefile required files.
+
+## Config
+
+*  Bumping version.
+
+## Docs
+
+*  Updating installation instructions.

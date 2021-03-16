@@ -38,6 +38,7 @@ chmod 4751 rad
 mv rad /usr/bin
 mv rad.1 /usr/share/man/man1/
 mv rad.conf.5 /usr/share/man/man5/
+mv rad.pam /etc/pam.d/rad
 ```
 
 ## Getting help

@@ -7,8 +7,8 @@ $(BINARY) : $(FILES)
 
 install : $(BINARY)
 	chown root:root $(BINARY)
-	cp $(BINARY) /usr/bin/
-	chmod 4711 /usr/bin/rad
+	cp $(BINARY) /usr/local/bin/
+	chmod 4711 /usr/local/bin/rad
 	touch $(CONF)
 	chown root:root $(CONF)
 	chmod 600 $(CONF)
@@ -17,7 +17,7 @@ install : $(BINARY)
 	cp rad.pam /etc/pam.d/rad
 
 uninstall :
-	rm /usr/bin/rad
+	rm /usr/local/bin/rad
 	rm /usr/share/man/man1/rad.1
 	rm /usr/share/man/man5/rad.conf.5
 	rm /etc/pam.d/rad

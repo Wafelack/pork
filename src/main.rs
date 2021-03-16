@@ -16,14 +16,13 @@
  *  along with rad.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-use std::{env, path::Path, process::Command};
+use std::{env, path::Path, process::Command, ffi::CString};
 
 mod config;
 mod errors;
 
 pub use errors::{error, RadError, Result};
-use libc::{setuid, getuid, getpwuid};
-use std::mem::size_of_val;
+use libc::{setuid, getuid, getpwuid, c_char};
 
 pub fn get_username(uid: u32) -> Result<String> {
     let returned = unsafe {
@@ -37,14 +36,10 @@ pub fn get_username(uid: u32) -> Result<String> {
             (*returned).pw_name
         };
 
-        let mut to_ret = String::new();
-        for i in 0..size_of_val(&raw_name) {
-            unsafe {
-                to_ret.push(*raw_name.offset(i as isize) as u8 as char); 
-            }
-        }
-
-        Ok(to_ret)
+        let to_ret = unsafe {CString::from_raw(
+            raw_name as *mut c_char
+        )};
+        Ok(to_ret.into_string().unwrap())
     }
 }
 

@@ -1,5 +1,5 @@
 CONF=/etc/rad.toml
-FILES=src/main.rs src/password.rs src/config.rs src/errors.rs
+FILES=src/main.rs src/config.rs src/errors.rs
 BINARY=target/release/rad
 
 $(BINARY) : $(FILES)

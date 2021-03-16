@@ -28,3 +28,10 @@
 ## Scripts
 
 *  Added uninstall rule to makefile.
+
+# 0.1.2 - 16/03/2021
+
+## Fix
+
+*  Securising password system. Use of pam instead of parsing /etc/shadow.
+*  Securising get_username. Using libc function getpwuid() instead of reading /etc/passwd.

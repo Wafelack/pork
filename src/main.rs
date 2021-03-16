@@ -16,30 +16,53 @@
  *  along with rad.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-use std::{fs, env, path::Path, process::Command};
+use std::{env, path::Path, process::Command};
 
 mod config;
 mod errors;
-mod password;
 
 pub use errors::{error, RadError, Result};
-use libc::{setuid, getuid};
-use password::check_password;
+use libc::{setuid, getuid, getpwuid};
+use std::mem::size_of_val;
 
 pub fn get_username(uid: u32) -> Result<String> {
-    let content = fs::read_to_string("/etc/passwd")?;
+    let returned = unsafe {
+        getpwuid(uid)
+    };
 
-    for line in content.lines() {
-        let splited = line.split(':').collect::<Vec<_>>();
+    if returned.is_null() {
+        Err(error(format!("No user found for uid `{}`.", uid)))
+    } else {
+        let raw_name = unsafe {
+            (*returned).pw_name
+        };
 
-        if splited[2].parse::<u32>().unwrap() == uid {
-            return Ok(
-                splited[0].to_string()
-                )
+        let mut to_ret = String::new();
+        for i in 0..size_of_val(&raw_name) {
+            unsafe {
+                to_ret.push(*raw_name.offset(i as isize) as u8 as char); 
+            }
         }
-    }
 
-    Err(error("No user found for this UID."))
+        Ok(to_ret)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn username() -> Result<()> {
+
+        let user = get_username(unsafe {
+            getuid()
+        })?;
+
+        println!("{}", user);
+
+        Ok(())
+    }
 }
 
 fn main() -> Result<()> {
@@ -80,7 +103,7 @@ fn main() -> Result<()> {
                     env!("CARGO_PKG_NAME")
                     )))
     } else {
-        
+
         let user = get_username(unsafe {
             getuid()
         })?;
@@ -97,12 +120,18 @@ fn main() -> Result<()> {
                 rpassword::prompt_password_stdout(&format!("[rad] Password for {}: ", user))
                 .unwrap();
             let mut counter = 1;
-            while !check_password(&user, &pass)? && counter < 3 {
+
+            let mut auth = pam::Authenticator::with_password("system-auth").unwrap();
+            auth.get_handler().set_credentials(&user, pass);
+
+            while !auth.authenticate().is_ok() && counter < 3 {
                 eprintln!("Authentication failed, please retry.");
                 counter += 1;
 
-                pass = rpassword::prompt_password_stdout(&format!("[rad] Password for {}: ", user))
+                pass = rpassword::prompt_password_stdout(&format!("[rad] Password for {}: ", &user))
                     .unwrap();
+
+                auth.get_handler().set_credentials(&user, pass);
             }
 
             if counter >= 3 {

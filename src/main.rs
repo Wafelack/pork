@@ -20,12 +20,10 @@ use std::{env, path::Path, process::Command};
 
 mod config;
 mod errors;
-mod password;
 
 pub use errors::{error, RadError, Result};
 use libc::{setuid, getuid, getpwuid};
 use std::mem::size_of_val;
-use password::check_password;
 
 pub fn get_username(uid: u32) -> Result<String> {
     let returned = unsafe {
@@ -122,12 +120,18 @@ fn main() -> Result<()> {
                 rpassword::prompt_password_stdout(&format!("[rad] Password for {}: ", user))
                 .unwrap();
             let mut counter = 1;
-            while !check_password(&user, &pass)? && counter < 3 {
+
+            let mut auth = pam::Authenticator::with_password("system-auth").unwrap();
+            auth.get_handler().set_credentials(&user, pass);
+
+            while !auth.authenticate().is_ok() && counter < 3 {
                 eprintln!("Authentication failed, please retry.");
                 counter += 1;
 
-                pass = rpassword::prompt_password_stdout(&format!("[rad] Password for {}: ", user))
+                pass = rpassword::prompt_password_stdout(&format!("[rad] Password for {}: ", &user))
                     .unwrap();
+
+                auth.get_handler().set_credentials(&user, pass);
             }
 
             if counter >= 3 {

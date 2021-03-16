@@ -1,4 +1,6 @@
-KERNEL=uname -a | awk '{print $1}'
+#!/usr/bin/env bash
+set -euo pipefail
+KERNEL=$(uname -a | awk '{print $1}')
 
 if [[ $KERNEL == "Darwin" ]]
 then

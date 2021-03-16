@@ -65,6 +65,21 @@ mod test {
     }
 }
 
+fn get_full_path(program: &str) -> String {
+    
+    let path_elements = env!("PATH").split(':').collect::<Vec<_>>();
+
+    for element in path_elements {
+        let formatted = format!("{}/{}", element, program);
+
+        if Path::new(&formatted).exists() {
+            return formatted;
+        }
+    }
+
+    program.to_string()
+}
+
 fn main() -> Result<()> {
 
     let config_file = "/etc/rad.toml";
@@ -94,7 +109,7 @@ fn main() -> Result<()> {
         return Ok(())
     }
 
-    let command = &args[0];
+    let command = &get_full_path(&args[0]);
 
     if !Path::new(config_file).exists() {
         Err(error(format!(

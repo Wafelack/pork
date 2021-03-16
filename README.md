@@ -14,6 +14,8 @@ You will need Cargo and GNU Make to perform this installation.
 ```
 $ git clone git@github.com:Wafelack/rad.git
 $ cd rad/
+$ chmod +x configure
+$ ./configure
 $ make
 # make install
 ```
@@ -27,17 +29,28 @@ $ make
 #!/usr/bin/env bash
 set -euo pipefail
 
+KERNEL=$(uname -a | awk '{print $1}')
+
+LOCAL=""
+GROUP="root"
+
+if [[ $KERNEL == "Darwin" ]]
+then
+	GROUP="wheel"
+	LOCAL="local/"
+fi
+
 if [[ ! -f rad.tar.bz2 ]]
 then
 	echo "No archive in the working directory."
 	exit 1
 fi
 tar -xjf rad.tar.bz2
-chown root:root rad
-chmod 4751 rad
-mv rad /usr/bin
-mv rad.1 /usr/share/man/man1/
-mv rad.conf.5 /usr/share/man/man5/
+chown root:$(GROUP) rad
+mv rad /usr/$(LOCAL)bin
+chmod 4751 /usr/$(LOCAL)bin/rad
+mv rad.1 /usr/$(LOCAL)share/man/man1/
+mv rad.conf.5 /usr/$(LOCAL)share/man/man5/
 mv rad.pam /etc/pam.d/rad
 ```
 

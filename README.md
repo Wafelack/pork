@@ -46,9 +46,11 @@ then
 	exit 1
 fi
 tar -xjf rad.tar.bz2
-chown root:$(GROUP) rad
 mv rad /usr/$(LOCAL)bin
+chown root:$(GROUP) rad
 chmod 4751 /usr/$(LOCAL)bin/rad
+touch /etc/rad.toml
+chown root:$(GROUP) /etc/rad.toml
 mv rad.1 /usr/$(LOCAL)share/man/man1/
 mv rad.conf.5 /usr/$(LOCAL)share/man/man5/
 mv rad.pam /etc/pam.d/rad

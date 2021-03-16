@@ -136,7 +136,7 @@ fn main() -> Result<()> {
                 .unwrap();
             let mut counter = 1;
 
-            let mut auth = pam::Authenticator::with_password("system-auth").unwrap();
+            let mut auth = pam::Authenticator::with_password("rad").unwrap();
             auth.get_handler().set_credentials(&user, pass);
 
             while !auth.authenticate().is_ok() && counter < 3 {

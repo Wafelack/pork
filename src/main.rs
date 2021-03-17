@@ -12,33 +12,26 @@
  *   GNU General Public License for more details.
  *
  *   You should have received a copy of the GNU General Public License
- *
- *  along with rad.  If not, see <https://www.gnu.org/licenses/>.
+ *   along with rad.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-use std::{env, path::Path, process::Command, ffi::CString};
+use std::{env, ffi::CString, path::Path, process::Command};
 
 mod config;
 mod errors;
 
 pub use errors::{error, RadError, Result};
-use libc::{setuid, getuid, getpwuid, c_char};
+use libc::{c_char, getpwuid, getuid, setuid};
 
 pub fn get_username(uid: u32) -> Result<String> {
-    let returned = unsafe {
-        getpwuid(uid)
-    };
+    let returned = unsafe { getpwuid(uid) };
 
     if returned.is_null() {
         Err(error(format!("No user found for uid `{}`.", uid)))
     } else {
-        let raw_name = unsafe {
-            (*returned).pw_name
-        };
+        let raw_name = unsafe { (*returned).pw_name };
 
-        let to_ret = unsafe {CString::from_raw(
-            raw_name as *mut c_char
-        )};
+        let to_ret = unsafe { CString::from_raw(raw_name as *mut c_char) };
         Ok(to_ret.into_string().unwrap())
     }
 }
@@ -49,10 +42,7 @@ mod test {
 
     #[test]
     fn username() -> Result<()> {
-
-        let user = get_username(unsafe {
-            getuid()
-        })?;
+        let user = get_username(unsafe { getuid() })?;
 
         println!("{}", user);
 
@@ -61,7 +51,6 @@ mod test {
 }
 
 fn get_full_path(program: &str) -> String {
-    
     let path_elements = env!("PATH").split(':').collect::<Vec<_>>();
 
     for element in path_elements {
@@ -76,7 +65,6 @@ fn get_full_path(program: &str) -> String {
 }
 
 fn main() -> Result<()> {
-
     let config_file = "/etc/rad.toml";
 
     let args = std::env::args().skip(1).collect::<Vec<_>>();
@@ -88,7 +76,10 @@ fn main() -> Result<()> {
     }
 
     if args[0] == "-h" || args[0] == "--help" {
-        println!("{} - execute commands as administrator", env!("CARGO_PKG_NAME"));
+        println!(
+            "{} - execute commands as administrator",
+            env!("CARGO_PKG_NAME")
+        );
         println!("{}", env!("CARGO_PKG_VERSION"));
         println!();
         println!("{}", usage);
@@ -101,25 +92,21 @@ fn main() -> Result<()> {
         return Ok(());
     } else if args[0] == "-v" || args[0] == "--version" {
         println!("{}", env!("CARGO_PKG_VERSION"));
-        return Ok(())
+        return Ok(());
     }
 
     let command = &get_full_path(&args[0]);
 
     if !Path::new(config_file).exists() {
         Err(error(format!(
-                    "Cannot find file `{}`. Consider creating it and adding content to it to use {}",
-                    config_file,
-                    env!("CARGO_PKG_NAME")
-                    )))
+            "Cannot find file `{}`. Consider creating it and adding content to it to use {}",
+            config_file,
+            env!("CARGO_PKG_NAME")
+        )))
     } else {
+        let user = get_username(unsafe { getuid() })?;
 
-        let user = get_username(unsafe {
-            getuid()
-        })?;
-
-        let (authorized, no_password) =
-            config::can_run_program(command, &user, config_file)?;
+        let (authorized, no_password) = config::can_run_program(command, &user, config_file)?;
 
         if !authorized {
             return Err(error("You are not authorized to perform this !"));
@@ -128,7 +115,7 @@ fn main() -> Result<()> {
         if !no_password {
             let mut pass =
                 rpassword::prompt_password_stdout(&format!("[rad] Password for {}: ", user))
-                .unwrap();
+                    .unwrap();
             let mut counter = 1;
 
             let mut auth = pam::Authenticator::with_password("rad").unwrap();
@@ -138,8 +125,9 @@ fn main() -> Result<()> {
                 eprintln!("Authentication failed, please retry.");
                 counter += 1;
 
-                pass = rpassword::prompt_password_stdout(&format!("[rad] Password for {}: ", &user))
-                    .unwrap();
+                pass =
+                    rpassword::prompt_password_stdout(&format!("[rad] Password for {}: ", &user))
+                        .unwrap();
 
                 auth.get_handler().set_credentials(&user, pass);
             }
@@ -161,9 +149,7 @@ fn main() -> Result<()> {
             vec![]
         };
 
-        Command::new(&command)
-            .args(&arguments)
-            .status()?;
+        Command::new(&command).args(&arguments).status()?;
 
         Ok(())
     }

@@ -9,7 +9,7 @@ It has only been tested on GNU/Linux (Calculate Linux) but should work on all \*
 
 ### From source (recommended)
 
-You will need Cargo and GNU Make to perform this installation.
+You will need Cargo, GNU Make and the GNU Compiler Collection to perform this installation.
 
 ```
 $ git clone git@github.com:Wafelack/rad.git

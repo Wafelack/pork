@@ -10,7 +10,7 @@ It has only been tested on GNU/Linux (Calculate Linux) but should work on all \*
 You will need Cargo, GNU Make and the GNU Compiler Collection to perform this installation.
 
 ```
-$ git clone git@github.com:Wafelack/rad.git
+$ git clone https://github.com/wafelack/rad.git
 $ cd rad/
 $ chmod +x configure
 $ ./configure

@@ -51,7 +51,7 @@ mod test {
 }
 
 fn get_full_path(program: &str) -> String {
-    let path_elements = env!("PATH").split(':').collect::<Vec<_>>();
+    let path_elements = env::var("PATH").and_then(|v| Ok(v.split(':').map(|s| s.to_string()).collect::<Vec<_>>())).unwrap_or(vec![]);
 
     for element in path_elements {
         let formatted = format!("{}/{}", element, program);

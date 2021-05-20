@@ -1,13 +1,11 @@
 # rad
 
-rad is a program which allows a user to run a command as an administrator.
+rad is a permissions manager.
 Its name is the acronym of **R**un as **Ad**ministrator.
 
 It has only been tested on GNU/Linux (Calculate Linux) but should work on all \*nix OSs.
 
 ## Installing
-
-### From source (recommended)
 
 You will need Cargo, GNU Make and the GNU Compiler Collection to perform this installation.
 
@@ -18,42 +16,6 @@ $ chmod +x configure
 $ ./configure
 $ make
 # make install
-```
-
-### From the release page
-
-* Download the latest archive from the releases page.
-* Execute the following script as root (You will need to have bash and tar installed):
-
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
-
-KERNEL=$(uname -a | awk '{print $1}')
-
-LOCAL=""
-GROUP="root"
-
-if [[ $KERNEL == "Darwin" ]]
-then
-	GROUP="wheel"
-	LOCAL="local/"
-fi
-
-if [[ ! -f rad.tar.bz2 ]]
-then
-	echo "No archive in the working directory."
-	exit 1
-fi
-tar -xjf rad.tar.bz2
-mv rad /usr/$(LOCAL)bin
-chown root:$(GROUP) rad
-chmod 4751 /usr/$(LOCAL)bin/rad
-touch /etc/rad.toml
-chown root:$(GROUP) /etc/rad.toml
-mv rad.1 /usr/$(LOCAL)share/man/man1/
-mv rad.conf.5 /usr/$(LOCAL)share/man/man5/
-mv rad.pam /etc/pam.d/rad
 ```
 
 ## Getting help

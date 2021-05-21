@@ -3,6 +3,8 @@
 rad is a permissions manager.
 Its name is the acronym of **R**un as **Ad**ministrator.
 
+**WARNING: This program has not received any security audit, and its safety is not guaranteed by the author. You use it at your own risk.**
+
 It has only been tested on GNU/Linux (Calculate Linux) but should work on all \*nix OSs.
 
 ## Installing

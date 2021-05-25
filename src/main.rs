@@ -57,7 +57,7 @@ fn get_full_path(program: &str) -> String {
         let formatted = format!("{}/{}", element, program);
 
         if Path::new(&formatted).exists() {
-            return formatted;
+            return formatted.replace("//", "/");
         }
     }
 

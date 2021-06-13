@@ -72,10 +72,9 @@ fn try_main() -> Result<()> {
 }
 fn get_path(program: &str) -> String {
     env::var("PATH")
-        .and_then(|v| Ok(v.split(':').map(|s| s.to_string()).collect()))
-        .unwrap_or(vec![])
-        .into_iter()
-        .map(|directory| {
+        .iter()
+        .flat_map(|v| v.split(':').map(ToString::to_string))
+        .find_map(|directory| {
             let full = format!("{}/{}", directory, program);
             if Path::new(&full).exists() {
                 Some(full.replace("//", "/"))
@@ -83,10 +82,7 @@ fn get_path(program: &str) -> String {
                 None
             }
         })
-        .filter(|e| e.is_some())
-        .map(|e| e.unwrap())
-        .nth(0)
-        .unwrap_or(program.to_string())
+        .unwrap_or_else(|| program.to_string())
 }
 fn allowed(program: &str, config: Config) -> u8 {
     /* 0: Cannot ; 1: Password; 2: No password */

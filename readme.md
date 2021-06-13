@@ -7,10 +7,10 @@ Pork is a minimalistic alternative to `sudo` and `doas` that is meant to be simp
 
 **Disclaimer: This hasn't received any security audit yet, the author is not responsible of any potential security problems occuring because of this program. You use it at your own risk.**
 
-Configuring
+Configuration
 -----------
 
-`pork` is configured by editing `src/config.rs`. This file contains explanations and detailed examples on how to configure it.
+The configuration of `pork` is done by editing the `src/config.rs` file and (re)compiling the source code.
 
 Installing
 ----------

@@ -19,7 +19,7 @@ struct Pork {
         help = "The command to run with overriden permissions."
     )]
     command: String,
-    #[structopt(required = true, help = "The COMMAND arguments.")]
+    #[structopt(required = true, help = "The COMMAND arguments.", default_value = "")]
     args: Vec<String>,
 }
 
@@ -62,7 +62,7 @@ fn try_main() -> Result<()> {
     }
     unsafe { if setuid(0) != 0 { Err(Error("Failed to change user id.".to_string())) } else { Ok(()) } }?;
     let status = Command::new(&command)
-        .args(&args.args)
+        .args(args.args.into_iter().filter(|s| !s.is_empty()))
         .status()
         .map_err(|e| Error(format!("Failed to run command: {}: {}", command, e)))?;
     if !status.success() {

@@ -15,5 +15,5 @@ install: $(BINARY)
 	cp $(PROGRAM).1 $(PREFIX)/share/man/man1/
 uninstall:
 	rm $(PREFIX)/bin/$(PROGRAM)
-	rm $(PREFIX)/share/man1/$(PROGRAM).1
+	rm $(PREFIX)/share/man/man1/$(PROGRAM).1
 	rm /etc/pam.d/$(PROGRAM)

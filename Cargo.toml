@@ -1,13 +1,11 @@
 [package]
-name = "rad"
-version = "0.1.4"
-authors = ["Wafelack <wafelack@protonmail.com>"]
+name = "pork"
+version = "0.1.0"
+authors = ["wafelack <wafelack@protonmail.com>"]
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-rpassword = "5.0"
-libc = "0.2.88"
-toml = "0.5.8"
+libc = "0.2.95"
+structopt = "0.3.21"
 pam = "0.7.0"
+rpassword = "5.0"

@@ -8,6 +8,7 @@ $(BINARY): $(FILES)
 	$(EDITOR) src/config.rs
 	cargo build --release
 install: $(BINARY)
+	strip $(BINARY)
 	chown root:root $(BINARY)
 	cp $(BINARY) $(PREFIX)/bin/$(PROGRAM)
 	chmod 4711 $(PREFIX)/bin/$(PROGRAM)

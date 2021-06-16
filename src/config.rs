@@ -33,8 +33,4 @@ pub struct Config<'a> {
  *   no_password: Perms::Some(&["/sbin/poweroff"]),
  * }];
  */
-pub static CONFIG: [Config; 1] = [Config {
-    uid: 1000,
-    programs: Perms::All,
-    no_password: Perms::Some(&["/sbin/poweroff", "/sbin/reboot", "/usr/bin/nmcli"])
-}];
+pub static CONFIG: [Config; 0] = [];

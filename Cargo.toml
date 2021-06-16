@@ -6,6 +6,5 @@ edition = "2018"
 
 [dependencies]
 libc = "0.2.95"
-structopt = "0.3.21"
 pam = "0.7.0"
 rpassword = "5.0"

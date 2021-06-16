@@ -7,21 +7,8 @@ use std::{
     path::Path,
     process::{exit, Command},
 };
-use structopt::StructOpt;
 
 const NAME: &str = "pork";
-
-#[derive(StructOpt)]
-#[structopt(name = NAME, about = "Permission OverRide Kontroller", rename_all = "upper")]
-struct Pork {
-    #[structopt(
-        required = true,
-        help = "The command to run with overriden permissions."
-    )]
-    command: String,
-    #[structopt(required = true, help = "The COMMAND arguments.", default_value = "")]
-    args: Vec<String>,
-}
 
 fn main() {
     match try_main() {
@@ -31,10 +18,11 @@ fn main() {
     exit(1);
 }
 fn try_main() -> Result<()> {
-    let args = Pork::from_args();
-    let cfg = config::gen_config();
+    let mut args = env::args().skip(1);
+    let command = args.nth(0).map_or(Err(Error("Missing operand.".to_string())), |v| Ok(v))?;
+    let cfg = config::CONFIG;
     let uid = unsafe { getuid() };
-    let command = get_path(args.command.as_str());
+    let command = get_path(command.as_str());
     let ucfg = match cfg.iter().position(|p| p.uid == uid) {
         Some(idx) => Ok(cfg[idx]),
         None => Err(Error(format!("No configuration available for {}.", uid))),
@@ -62,7 +50,7 @@ fn try_main() -> Result<()> {
     }
     unsafe { if setuid(0) != 0 { Err(Error("Failed to change user id.".to_string())) } else { Ok(()) } }?;
     let status = Command::new(&command)
-        .args(args.args.into_iter().filter(|s| !s.is_empty()))
+        .args(args)
         .status()
         .map_err(|e| Error(format!("Failed to run command: {}: {}", command, e)))?;
     if !status.success() {

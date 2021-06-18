@@ -8,25 +8,27 @@ use std::{
     process::{exit, Command},
 };
 
-const NAME: &str = "pork";
-
 fn main() {
     match try_main() {
         Ok(()) => exit(0),
-        Err(e) => eprintln!("{}: {}", NAME, e.0),
+        Err(e) => eprintln!("pork: {}", e.0),
     }
     exit(1);
 }
 fn try_main() -> Result<()> {
     let mut args = env::args().skip(1);
-    let command = args.nth(0).map_or(Err(Error("Missing operand.".to_string())), |v| Ok(v))?;
     let cfg = config::CONFIG;
     let uid = unsafe { getuid() };
-    let command = get_path(command.as_str());
+    let command = get_path(
+        args.nth(0)
+            .map_or(Err(Error("Missing operand.".to_string())), |v| Ok(v))?,
+    );
+
     let ucfg = match cfg.iter().position(|p| p.uid == uid) {
         Some(idx) => Ok(cfg[idx]),
         None => Err(Error(format!("No configuration available for {}.", uid))),
     }?;
+
     let no_password = match allowed(&command, ucfg) {
         0 => Err(Error(format!(
             "{} is not allowed to perform this command.",
@@ -34,6 +36,7 @@ fn try_main() -> Result<()> {
         ))),
         x => Ok(x == 2),
     }?;
+
     if !no_password {
         let pass = rpassword::prompt_password_stdout("Password: ").unwrap();
         let mut auth = pam::Authenticator::with_password("pork").unwrap();
@@ -46,19 +49,31 @@ fn try_main() -> Result<()> {
             },
             pass,
         );
-        auth.authenticate().map_err(|_| Error(format!("Invalid password.")))?;
+        auth.authenticate()
+            .map_err(|_| Error(format!("Invalid password.")))?;
     }
-    unsafe { if setuid(0) != 0 { Err(Error("Failed to change user id.".to_string())) } else { Ok(()) } }?;
+
+    unsafe {
+        if setuid(0) != 0 {
+            /* Set identity to root */
+            Err(Error("Failed to change user id.".to_string()))
+        } else {
+            Ok(())
+        }
+    }?;
+
     let status = Command::new(&command)
         .args(args)
         .status()
         .map_err(|e| Error(format!("Failed to run command: {}: {}", command, e)))?;
+
     if !status.success() {
         exit(status.code().unwrap_or(1));
     }
+
     Ok(())
 }
-fn get_path(program: &str) -> String {
+fn get_path(program: String) -> String {
     env::var("PATH")
         .iter()
         .flat_map(|v| v.split(':').map(ToString::to_string))

@@ -1,4 +1,4 @@
-.TH PORK 1 2021-06-13 "General Commands"
+.TH PORK 1 2021-06-19 "User Commands"
 
 .SH NAME
 pork \- Permission OverRide Kontroller
@@ -6,16 +6,28 @@ pork \- Permission OverRide Kontroller
 .SH SYNOPSIS
 .B pork
 .IR COMMAND
-.IR ARGS...
+[\fIARG\fR]...
 
 .SH DESCRIPTION
-\fBpork\fR allows you to override permissions and run a command as root.
+\fBpork\fR allows permitted users to execute COMMAND with the given ARG(s) as the superuser, with or without password authentication, as specified by the permissions configuration.
 
 .SH CONFIGURATION
 \fBpork\fR is configured by editing the \fIsrc/config.rs\fR file and compiling the source code.
 
+.SH EXIT VALUE
+
+If the current user is not in the configuration file / is not allowed to run a command, if \fBpork\fR cannot execute the given command or if changing the current UID fails, \fBpork\fR exits with a value of 1.
+
+Otherwise, \fBpork\fR exits with the exit status of the program that was executed.
+
 .SH EXAMPLE
-pork mount /dev/sda1 /mnt
+Powering off your computer.
+.br
+$ pork poweroff
+
+Installing a decent text editor.
+.br
+$ pork emerge --ask vim
 
 .SH AUTHORS
 Written by Wafelack.
@@ -29,7 +41,16 @@ This is free software: your are free to change and redistribute it.
 .br
 There is NO WARRANTY, to extent permitted by law.
 
+.SH SECURITY
+To prevent command spoofing, \fBpork\fR requires absolute paths in its configuration and checks the current directory last when searching for a command in the PATH.
+
 .SH REPORTING BUGS
 Please report any bug to the pork repository issues page
 .br
     <https://github.com/miniutils/pork/issues/new>
+
+.SH DISCLAIMER
+This program hasn't received any security audit yet, the author is not responsible of any potential problem occuring because of this program. You use it at your own risk. Refer to the \fICOPYING\fR file or the \fICOPYRIGHT\fR section of this page for more information.
+
+.SH SEE ALSO
+\fIsetuid\fR(2), \fIPAM\fR(8)
